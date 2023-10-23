@@ -9,7 +9,6 @@ using HotelListing.API.Data;
 using HotelListing.API.Models.Country;
 using AutoMapper;
 using HotelListing.API.Contracts;
-using System.Diagnostics.Metrics;
 
 namespace HotelListing.API.Controllers
 {
@@ -28,10 +27,10 @@ namespace HotelListing.API.Controllers
 
         // GET: api/Countries
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetCountryDtos>>> GetCountries()
+        public async Task<ActionResult<IEnumerable<GetCountryDto>>> GetCountries()
         {
             var countries = await _countriesRepository.GetAllAsync();
-            var records = _mapper.Map<List<GetCountryDtos>>(countries);
+            var records = _mapper.Map<List<GetCountryDto>>(countries);
             return Ok(records);
         }
 
@@ -41,14 +40,14 @@ namespace HotelListing.API.Controllers
         {
             var country = await _countriesRepository.GetDetails(id);
 
-            if (country == null)
+            if (country is null)
             {
                 return NotFound();
             }
 
             var record = _mapper.Map<GetCountryDetailsDto>(country);
 
-            return record;
+            return Ok(record);
         }
 
         // PUT: api/Countries/5
@@ -72,7 +71,6 @@ namespace HotelListing.API.Controllers
             {
                 await _countriesRepository.UpdateAsync(_mapper.Map(updateCountryDto, country));
             }
-
             catch (DbUpdateConcurrencyException) {
                 if (!await _countriesRepository.Exists(id))
                 {
